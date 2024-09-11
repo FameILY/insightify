@@ -26,6 +26,7 @@ async function fetchYoutubeAnalyticsData(accessToken){
 } 
 
 export async function GET(req){
+  console.log(req)
   const token = await getToken({req})
   console.log("Retrieved token:", token);
 

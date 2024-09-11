@@ -18,7 +18,7 @@ export default function Youtube() {
   };
 
   return (
-    <div className="flex w-screen h-screen justify-center items-center flex-col">
+    <div className="flex justify-center items-center flex-col">
       <h1 className="text-5xl font-bold mb-4">YT!</h1>
       <Button onClick={fetchData}>Get data</Button>
       <Button onClick={() => signOut()}>Sign Out</Button>
