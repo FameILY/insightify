@@ -1,6 +1,6 @@
 import React from "react";
 import Hero from "@/components/Landing/Hero";
-import Dashboard from "./[dashboard]/dashboard/page";
+import Dashboard from "./(dashboard)/dashboard/page";
 import About from "@/components/Landing/About";
 import Feature from "@/components/Landing/Feature";
 import Footer from "@/components/Landing/Footer";
