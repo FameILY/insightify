@@ -29,10 +29,7 @@ const options = {
   }
 };
 
-export async function GET(req, res) {
-  return NextAuth(req, res, options);
-}
+// Directly export NextAuth as the default export (no need for GET and POST manually)
+const handler = NextAuth(options);
 
-export async function POST(req, res) {
-  return NextAuth(req, res, options);
-}
+export { handler as GET, handler as POST };

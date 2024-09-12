@@ -3,7 +3,6 @@ import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 
 import { cn } from "@/lib/utils";
-import { Header } from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const fontSans = FontSans({
@@ -33,7 +32,6 @@ export default function RootLayout({ children }) {
         >
           <SessionProviderWrapper>
             <div className={fontSans.className}>
-              <Header />
               {children}
             </div>
           </SessionProviderWrapper>
