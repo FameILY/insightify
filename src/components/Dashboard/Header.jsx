@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/dark-mode.jsx";
+import { useRouter } from "next/navigation";
 
 import {
   Bell,
@@ -45,6 +46,16 @@ export const description =
 
 function Header({ mainContent }) {
   const { data: session } = useSession();
+  const router = useRouter();
+  const logoutHandle = async () => {
+    try {
+      await signOut({ redirect: false })
+      router.push('/')
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
 
   return (
     <>
@@ -235,7 +246,7 @@ function Header({ mainContent }) {
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={logoutHandle}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </header>
