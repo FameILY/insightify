@@ -26,20 +26,20 @@ async function fetchYoutubeAnalyticsData(accessToken){
 } 
 
 export async function GET(req){
-  console.log(req)
-  const token = await getToken({req})
-  console.log("Retrieved token:", token);
-
-  if (token?.accessToken) {
-    try {
-      const data = await fetchYoutubeAnalyticsData(token.accessToken);
-      return NextResponse.json(data, {status: 200})
-    } catch (error) {
-      return new Response(error, {status: 500})
-
+  // console.log(req)
+    const accessToken = req.headers.get('accessToken')
+    if (accessToken) {
+      try {
+        const data = await fetchYoutubeAnalyticsData(accessToken);
+        return NextResponse.json(data, {status: 200})
+      } catch (error) {
+        return new Response(error, {status: 500})
+      }
+    } else {
+      return new Response("Unauthorized, no token", {status: 401})
     }
-  } else {
-    return new Response("Unauthorized, no token", {status: 401})
+  // } else {
+  //   return new Response("Unauthorized, no token", {status: 401})
 
-  }
+  // }
 }

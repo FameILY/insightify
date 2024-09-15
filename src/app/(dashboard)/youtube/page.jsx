@@ -1,14 +1,21 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { signOut } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 
 export default function Youtube() {
   const [data, setData] = useState(null);
+  const { data: session } = useSession();
+  
 
   const fetchData = async () => {
     try {
-      const res = await fetch('/api/youtube');
+      const res = await fetch('/api/youtube', {
+        headers: {
+          'Authorization': `Bearer yourtokenhere`, //add token from mongo here somehow
+          'Accept': 'application/json'
+        }
+      });
       if (!res.ok) throw new Error('Failed to fetch data');
       const data = await res.json();
       setData(data);
