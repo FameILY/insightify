@@ -1,8 +1,11 @@
 // pages/api/connect/youtube/callback.js
 import { google } from "googleapis";
-import { MongoClient } from "mongodb";
+
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
+import clientPromise from "@/lib/db"; // Use the MongoDB connection utility
+
+
 
 export async function GET(req) {
   try {
@@ -39,7 +42,7 @@ export async function GET(req) {
 
     // Save the tokens in MongoDB
     try {
-      const client = await MongoClient.connect(process.env.MONGODB_URI);
+      const client = await clientPromise; // Use the MongoDB connection utility
       const db = client.db();
       const collection = db.collection("users");
 

@@ -1,7 +1,7 @@
 // app/api/auth/[...nextauth]/route.js
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { MongoClient } from "mongodb"; // Import MongoDB
+import clientPromise from "@/lib/db"; // Use the MongoDB connection utility
 
 const options = {
   providers: [
@@ -29,10 +29,7 @@ const options = {
     },
     async signIn({user, account}){
       try {
-        const client = await MongoClient.connect(process.env.MONGODB_URI);
-        if (client) {
-          console.log("connected")
-        }
+        const client = await clientPromise; // Use the MongoDB connection utility
         const db = client.db();
         const collection = db.collection("users");
 
