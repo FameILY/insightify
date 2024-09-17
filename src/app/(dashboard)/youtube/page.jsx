@@ -10,14 +10,16 @@ export default function Youtube() {
 
   const fetchData = async () => {
     try {
+      console.log(process.env.NEXT_API_KEY)
       const res = await fetch('/api/youtube', {
         headers: {
-          'Authorization': `Bearer yourtokenhere`, //add token from mongo here somehow
+          'Authorization': process.env.NEXT_PUBLIC_API_KEY,
+          'email': session.user.email,
           'Accept': 'application/json'
         }
       });
-      if (!res.ok) throw new Error('Failed to fetch data');
       const data = await res.json();
+      alert(data.message)
       setData(data);
     } catch (error) {
       console.error(error);

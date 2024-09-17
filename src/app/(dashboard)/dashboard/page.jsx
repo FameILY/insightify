@@ -4,7 +4,8 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Dashboard/Header";
-export default function Dashboard() {
+export default function Dashboard({isYtConnected}) {
+  const {data: session} = useSession()
   const router = useRouter();
   const redirectYoutube = async () => {
     try {
@@ -35,3 +36,14 @@ export default function Dashboard() {
     </>
   );
 }
+
+
+// // Fetch token status on server side
+// export async function getServerSideProps(context) {
+//   const email = context.session.user.email; // Replace with actual user ID retrieval
+//   const { isYtConnected } = await checkYoutubeConnection(email);
+
+//   return {
+//     props: { isYtConnected },
+//   };
+// }
