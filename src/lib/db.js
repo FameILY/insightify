@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === "development") {
 } else {
   // In production mode, it's safe to just use the client.
   client = new MongoClient(uri);
-  clientPromise = client.connect();
+  clientPromise = await client.connect();
 }
 
 export default clientPromise;
