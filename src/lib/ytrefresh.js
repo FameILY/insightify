@@ -49,6 +49,15 @@ export async function refreshAccessToken(email) {
     return { access_token, expiry_date };
   } catch (error) {
     console.error("Error refreshing access token:", error);
+
+    // Handle specific OAuth errors
+    if (error.response?.data?.error === 'invalid_grant') {
+      // The refresh token is invalid (e.g., revoked or expired)
+      // You can return a special status or flag to prompt the user to re-login
+      throw new Error("Refresh token is invalid");
+    }
+
+    // Handle other OAuth errors
     throw new Error("Failed to refresh access token");
   }
 }

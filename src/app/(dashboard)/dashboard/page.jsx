@@ -36,14 +36,3 @@ export default function Dashboard({isYtConnected}) {
     </>
   );
 }
-
-
-// // Fetch token status on server side
-// export async function getServerSideProps(context) {
-//   const email = context.session.user.email; // Replace with actual user ID retrieval
-//   const { isYtConnected } = await checkYoutubeConnection(email);
-
-//   return {
-//     props: { isYtConnected },
-//   };
-// }

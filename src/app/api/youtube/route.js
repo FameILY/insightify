@@ -40,7 +40,7 @@ export async function GET(req) {
     const user = await db.collection("users").findOne({ email });
     // console.log("User: ",user)
     const tokenData = await user.connectedApps.youtube;
-    if (!tokenData) {
+    if (!user || !tokenData) {
       throw new Error("no token found for user");
     }
   
@@ -48,9 +48,13 @@ export async function GET(req) {
   
     //if expired
     if (isTokenExpired) {
-      console.log("token expired, getting a new token")
-      const { access_token } = await refreshAccessToken(email);
-      tokenData.access_token = access_token;
+      try {
+        console.log("token expired, refreshing...")
+        const { access_token } = await refreshAccessToken(email);
+        tokenData.access_token = access_token;
+      } catch (err) {
+        return NextResponse.json({ message: "Failed to refresh access token", error: err }, { status: 401});
+      }
     }
   
     if (tokenData.access_token) {
@@ -64,7 +68,7 @@ export async function GET(req) {
       return new Response("Unauthorized, no access token", { status: 401 });
     }
   } else {
-    return NextResponse.json({message: 'Unauthorized'}, {status: 401})
+    return NextResponse.json({message: 'Unauthorized'}, {status: 500})
   }
 
 }
