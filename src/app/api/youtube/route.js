@@ -27,6 +27,37 @@ async function fetchYoutubeAnalyticsData(accessToken) {
   return data;
 }
 
+function processMonthlyData(data) {
+  const monthlyData = [];
+
+  if (data.rows) {
+    data.rows.forEach(row => {
+      const [day, views, estimatedMinutesWatched, averageViewDuration, averageViewPercentage, subscribersGained] = row;
+      const month = day.substring(0, 7); // Extract the month (YYYY-MM)
+
+      // Find existing month entry or create a new one
+      let monthEntry = monthlyData.find(entry => entry.month === month);
+      if (!monthEntry) {
+        monthEntry = { month, views: 0, subscribersGained: 0 };
+        monthlyData.push(monthEntry);
+      }
+
+      // Aggregate the data
+      monthEntry.views += Number(views);
+      monthEntry.subscribersGained += Number(subscribersGained);
+    });
+
+
+  // Ensure monthlyData is in the format you expect
+  console.log("Processed Monthly Data:", monthlyData);
+  return monthlyData;
+}
+
+  console.log(monthlyData)
+  return monthlyData;
+}
+
+
 export async function GET(req) {
   
   const email = await req.headers.get('email')
@@ -57,14 +88,16 @@ export async function GET(req) {
       }
     }
   
-    if (tokenData.access_token) {
-      try {
-        const data = await fetchYoutubeAnalyticsData(tokenData.access_token);
-        return NextResponse.json({message: "Success",data: data}, { status: 200 });
-      } catch (error) {
-        return new Response(error, { status: 500 });
-      }
-    } else {
+    
+ if (tokenData.access_token) {
+  try {
+    const data = await fetchYoutubeAnalyticsData(tokenData.access_token);
+    const monthlyData = processMonthlyData(data);
+    return NextResponse.json({ message: "Success", data: monthlyData }, { status: 200 });
+  } catch (error) {
+    return new Response(error, { status: 500 });
+  }
+} else {
       return new Response("Unauthorized, no access token", { status: 401 });
     }
   } else {

@@ -42,7 +42,10 @@ export async function GET(req) {
 
     // Save the tokens in MongoDB
     try {
-      const client = await clientPromise; // Use the MongoDB connection utility
+      console.log("Attempting to connect to MongoDB");
+      const client = await clientPromise;
+      console.log("MongoDB Client connected:");
+
       const db = client.db();
       const collection = db.collection("users");
 

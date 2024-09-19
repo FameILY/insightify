@@ -5,8 +5,10 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
+import YouTubeAnalyticsChart from '@/components/youtube/charts';
 
 export default function Youtube() {
+  const [monthlyData, setMonthlyData] = useState(0);
   const [data, setData] = useState(null);
   const { data: session } = useSession();
   const [loginAgain, setLoginAgain] = useState(false);
@@ -99,8 +101,15 @@ export default function Youtube() {
         throw new Error("Token expired or unauthorized. Please sign in again.");
       }
 
-      const data = await res.json();
+      const data = await res.json();  
+      const formattedMonthlyData = Object.entries(data.data).map(([month, metrics]) => ({
+        month,
+        views: metrics.views,
+        subscribersGained: metrics.subscribersGained,
+      }));
+      setMonthlyData(formattedMonthlyData);
       toast({
+
         title: "Data Fetched Successfully",
         description: "The data has been fetched successfully.",
         action: <ToastAction altText="OK">OK</ToastAction>,
@@ -113,11 +122,9 @@ export default function Youtube() {
 
   return (
     <div className="flex justify-center items-center flex-col">
-      <h1 className="text-5xl font-bold mb-4">YT!</h1>
-      <Button onClick={fetchData}>Get data</Button>
-      <pre className="mt-4 overflow-auto h-96">
-        {data ? JSON.stringify(data, null, 2) : "No data available"}
-      </pre>
+       <h1 className="text-5xl font-bold mb-4">YouTube Analytics</h1>
+      <Button onClick={fetchData}>Get Data</Button>
+      <YouTubeAnalyticsChart monthlyData={monthlyData} />
     </div>
   );
 }
