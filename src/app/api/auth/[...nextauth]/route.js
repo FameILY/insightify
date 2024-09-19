@@ -1,7 +1,7 @@
 // app/api/auth/[...nextauth]/route.js
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import clientPromise from "@/lib/db"; // Use the MongoDB connection utility
+import connectToDb from "@/lib/db"; // Use the MongoDB connection utility
 
 const options = {
   providers: [
@@ -10,10 +10,10 @@ const options = {
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
       authorization: {
         params: {
-          scope: "openid email profile"
-        }
-      }
-    })  
+          scope: "openid email profile",
+        },
+      },
+    }),
   ],
   callbacks: {
     async jwt({ token, account }) {
@@ -27,9 +27,9 @@ const options = {
       // console.log(session)
       return session;
     },
-    async signIn({user, account}){
+    async signIn({ user, account }) {
       try {
-        const client = await clientPromise; // Use the MongoDB connection utility
+        const client = await connectToDb();
         const db = client.db();
         const collection = db.collection("users");
 
@@ -43,7 +43,7 @@ const options = {
             name: user.name,
             image: user.image,
             createdAt: new Date(),
-            connectedApps: {} // Initially no apps connected
+            connectedApps: {}, // Initially no apps connected
           });
         }
         await client.close();
@@ -51,9 +51,8 @@ const options = {
         console.error("Error inserting user into MongoDB", error);
       }
       return true;
-    
-    }
-  }
+    },
+  },
 };
 
 // Directly export NextAuth as the default export (no need for GET and POST manually)

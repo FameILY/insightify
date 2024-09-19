@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/dark-mode.jsx";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 import {
   Bell,
@@ -41,21 +41,21 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signIn, signOut, useSession } from "next-auth/react";
 
-export const description =
-  "A products dashboard with a sidebar navigation and a main content area. The dashboard has a header with a search input and a user menu. The sidebar has a logo, navigation links, and a card with a call to action. The main content area shows an empty state with a call to action.";
-
 function Header({ mainContent }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname(); // Get the current path
   const logoutHandle = async () => {
     try {
-      await signOut({ redirect: false })
-      router.push('/')
+      await signOut({ redirect: false });
+      router.push("/");
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
+  };
 
-  }
+  // A helper function to determine if the link is active
+  const isActiveLink = (linkPath) => pathname === linkPath;
 
   return (
     <>
@@ -76,14 +76,22 @@ function Header({ mainContent }) {
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                    isActiveLink("/dashboard")
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
                 >
                   <Home className="h-4 w-4" />
                   Dashboard
                 </Link>
                 <Link
                   href="/analytics"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                    isActiveLink("/analytics")
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
                 >
                   <LineChart className="h-4 w-4" />
                   Analytics
@@ -93,21 +101,33 @@ function Header({ mainContent }) {
                 </Link>
                 <Link
                   href="/predictions"
-                  className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                    isActiveLink("/predictions")
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
                 >
                   <ChartColumnDecreasing className="h-4 w-4" />
-                  Predictions{" "}
+                  Predictions
                 </Link>
                 <Link
                   href="/reports"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                    isActiveLink("/reports")
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
                 >
                   <ClipboardPlus className="h-4 w-4" />
                   Reports
                 </Link>
                 <Link
                   href="/settings"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                    isActiveLink("/settings")
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
                 >
                   <Settings className="h-4 w-4" />
                   Settings
@@ -115,7 +135,7 @@ function Header({ mainContent }) {
               </nav>
             </div>
             <div className="mt-auto p-4">
-              <Card x-chunk="dashboard-02-chunk-0">
+              <Card>
                 <CardHeader className="p-2 pt-0 md:p-4">
                   <CardTitle>Upgrade to Pro</CardTitle>
                   <CardDescription>
@@ -157,14 +177,22 @@ function Header({ mainContent }) {
                   </Link>
                   <Link
                     href="/dashboard"
-                    className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                    className={`flex items-center gap-4 rounded-xl px-3 py-2 ${
+                      isActiveLink("/dashboard")
+                        ? "bg-muted text-primary"
+                        : "text-muted-foreground hover:text-primary"
+                    }`}
                   >
                     <Home className="h-5 w-5" />
                     Dashboard
                   </Link>
                   <Link
                     href="/analytics"
-                    className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
+                    className={`flex items-center gap-4 rounded-xl px-3 py-2 ${
+                      isActiveLink("/analytics")
+                        ? "bg-muted text-primary"
+                        : "text-muted-foreground hover:text-primary"
+                    }`}
                   >
                     <LineChart className="h-4 w-4" />
                     Analytics
@@ -174,21 +202,33 @@ function Header({ mainContent }) {
                   </Link>
                   <Link
                     href="/predictions"
-                    className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                    className={`flex items-center gap-4 rounded-xl px-3 py-2 ${
+                      isActiveLink("/predictions")
+                        ? "bg-muted text-primary"
+                        : "text-muted-foreground hover:text-primary"
+                    }`}
                   >
                     <ChartColumnDecreasing className="h-4 w-4" />
                     Predictions
                   </Link>
                   <Link
                     href="/reports"
-                    className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                    className={`flex items-center gap-4 rounded-xl px-3 py-2 ${
+                      isActiveLink("/reports")
+                        ? "bg-muted text-primary"
+                        : "text-muted-foreground hover:text-primary"
+                    }`}
                   >
                     <ClipboardPlus className="h-4 w-4" />
                     Reports
                   </Link>
                   <Link
                     href="/settings"
-                    className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                    className={`flex items-center gap-4 rounded-xl px-3 py-2 ${
+                      isActiveLink("/settings")
+                        ? "bg-muted text-primary"
+                        : "text-muted-foreground hover:text-primary"
+                    }`}
                   >
                     <Settings className="h-4 w-4" />
                     Settings

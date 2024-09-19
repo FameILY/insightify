@@ -2,7 +2,7 @@ import React from 'react'
 
 function Analytics() {
   return (
-    <div>Analytics Page Here</div>
+    <div>Analytics Page Herenuasd</div>
   )
 }
 

@@ -20,10 +20,10 @@ export function Header() {
           <h1 className="text-2xl font-medium">Insightify</h1>
 
           <div className="space-x-4 flex flex-row items-center">
-            <a href="/" class=" hover:text-gray-400">
+            <a href="#hero" class=" hover:text-gray-400">
               Home
             </a>
-            <a href="#" class=" hover:text-gray-400">
+            <a href="#about" class=" hover:text-gray-400">
               About
             </a>
 

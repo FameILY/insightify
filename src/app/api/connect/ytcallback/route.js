@@ -3,12 +3,18 @@ import { google } from "googleapis";
 
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import clientPromise from "@/lib/db"; // Use the MongoDB connection utility
-
-
+import connectToDb from "@/lib/db"; // Use the MongoDB connection utility
 
 export async function GET(req) {
   try {
+    
+    const client = await connectToDb();
+    console.log("Client: "+ client)
+    const db = await client.db();
+    console.log("DB: "+db)
+    
+
+
     // Extract the code from the query parameters
     const url = new URL(req.url, process.env.NEXTAUTH_URL);
     const code = url.searchParams.get("code");
@@ -32,19 +38,20 @@ export async function GET(req) {
     const session = await getServerSession({ req });
 
     if (!session || !session.user || !session.user.email) {
-      return NextResponse.json({ message: "Error: Unable to retrieve user session" });
+      return NextResponse.json({
+        message: "Error: Unable to retrieve user session",
+      });
     }
 
     const email = session.user.email;
-    console.log("heyyyyyyyyy")
-    console.log("EMAIL: ", email)
-    console.log("TOKENS: ", tokens)
-
+    console.log("heyyyyyyyyy");
+    console.log("EMAIL: ", email);
+    console.log("TOKENS: ", tokens);
+    await connectToDb();
     // Save the tokens in MongoDB
     try {
-      const client = await clientPromise; // Use the MongoDB connection utility
-      const db = client.db();
-      const collection = db.collection("users");
+     
+      const collection = await db.collection("users");
 
       await collection.updateOne(
         { email },
@@ -65,6 +72,8 @@ export async function GET(req) {
     }
   } catch (error) {
     console.error("Error during YouTube OAuth callback", error);
-    return NextResponse.json({ message: "Error retrieving or saving YouTube token" });
+    return NextResponse.json({
+      message: "Error retrieving or saving YouTube token",
+    });
   }
 }

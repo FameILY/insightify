@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <SessionProviderWrapper>
-            <div className={fontSans.className}>
+            <div>
               {children}
             </div>
           </SessionProviderWrapper>

@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-import clientPromise from "@/lib/db";
+import connectToDb from "@/lib/db";
 
 // Refresh the access token using the refresh token
 export async function refreshAccessToken(email) {
@@ -10,7 +10,7 @@ export async function refreshAccessToken(email) {
   );
 
   // Ensure that the MongoDB client is connected
-  const client = await clientPromise;
+  const client = await connectToDb();
   const db = client.db();
 
   // Find the user by email
@@ -51,7 +51,7 @@ export async function refreshAccessToken(email) {
     console.error("Error refreshing access token:", error);
 
     // Handle specific OAuth errors
-    if (error.response?.data?.error === 'invalid_grant') {
+    if (error.response?.data?.error === "invalid_grant") {
       // The refresh token is invalid (e.g., revoked or expired)
       // You can return a special status or flag to prompt the user to re-login
       throw new Error("Refresh token is invalid");

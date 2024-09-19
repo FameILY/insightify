@@ -74,8 +74,11 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
+        sans: ['var(--font-sans)', ...fontFamily.sans],
       },
+      daisyui: {
+        themes: false
+      }
     },
   },
   plugins: [require("tailwindcss-animate"),

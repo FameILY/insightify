@@ -26,7 +26,7 @@ const Hero = () => {
   };
   return (
     <>
-      <div className="flex flex-col mt-4 p-4 md:flex-row md:items-center md:justify-between md:px-32 min-h-96 ">
+      <div id="hero" className="flex flex-col mt-4 p-4 md:flex-row md:items-center md:justify-between md:px-32 min-h-96 ">
         <div className="flex flex-col">
           <div className="scroll-m-20 text-5xl font-bold tracking-tight lg:text-7xl">
             Insightify

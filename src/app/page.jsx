@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import Hero from "@/components/Landing/Hero";
 import Dashboard from "./(dashboard)/dashboard/page";
@@ -5,10 +6,16 @@ import About from "@/components/Landing/About";
 import Feature from "@/components/Landing/Feature";
 import Footer from "@/components/Landing/Footer";
 import { Header } from "@/components/header";
+import { ReactLenis, useLenis } from '@studio-freight/react-lenis'
+
 
 const Home = () => {
+  const lenis = useLenis(({ scroll }) => {
+    // called every scroll
+  })
   return (
     <>
+    <ReactLenis root>
       <Header />
 
       <Hero />
@@ -44,6 +51,7 @@ const Home = () => {
         />
       </div>
       <Footer />
+      </ReactLenis>
     </>
   );
 };
