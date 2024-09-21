@@ -68,6 +68,7 @@ export default function Youtube() {
   useEffect(() => {
     if (loginAgain) {
       toast({
+        variant: "destructive",
         title: "Oops, you need to login to YouTube again!",
         description:
           "Your token has expired. This could be due to a password change or you removed this app's permission to access your YouTube data.",
@@ -75,6 +76,8 @@ export default function Youtube() {
           <ToastAction altText="Login to YouTube Again">Login</ToastAction>
         ),
       });
+
+      setLoginAgain(false)
     }
   }, [loginAgain, toast]);
 
@@ -98,7 +101,7 @@ export default function Youtube() {
 
       if (res.status === 401) {
         setLoginAgain(true);
-        throw new Error("Token expired or unauthorized. Please sign in again.");
+        // throw new Error("Token expired or unauthorized. Please sign in again.");
       }
 
       const data = await res.json();  

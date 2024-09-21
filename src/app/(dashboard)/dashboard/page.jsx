@@ -28,9 +28,9 @@ export default function Dashboard() {
   return (
     <>
       <div className="">
-        <div className="flex flex-col justify-center items-center">
+        {/* <div className="flex flex-col justify-center items-center">
           <Button onClick={connectYoutube}>Connect to Youtube</Button>
-        </div>
+        </div> */}
         <Button onClick={redirectYoutube}>Youtube</Button>
       </div>
     </>

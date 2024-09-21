@@ -14,14 +14,57 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 function Settings() {
   const { data: session } = useSession();
   const [apps, setApps] = useState({});
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const handleLogout = async (account) => {
-    console.log(account);
+    if (session?.user.email) {
+      const userEmail = session?.user.email;
+
+      if (account == "youtube") {
+        console.log("Logout function: ", account);
+        const res = await fetch(`/api/connect/youtubeLogout/${userEmail}`, {
+          method: "POST",
+          headers: {
+            Authorization: process.env.NEXT_PUBLIC_API_KEY,
+          },
+        });
+        console.log(res.json());
+      }
+      if (account == "instagram") {
+        const res = await fetch(`/api/connect/instagramLogout/${userEmail}`, {
+          method: "POST",
+          headers: {
+            Authorization: process.env.NEXT_PUBLIC_API_KEY,
+          },
+        });
+      }
+    }
+  };
+
+  const handleConnect = async (account) => {
+    if (account == "youtube") {
+      console.log(account);
+      try {
+        router.push("/api/connect/youtube");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    if (account == "instagram") {
+      try {
+        router.push("/api/connect/instagram");
+      } catch (err) {
+        console.log(err);
+      }
+    }
   };
 
   useEffect(() => {
@@ -119,9 +162,8 @@ function Settings() {
                 {/* {console.log("Apps: ",apps)} */}
                 <DropdownMenu>
                   <DropdownMenuTrigger>
-                  {app === "youtube" && <FaYoutube className="size-7" />}
-                  {app === "instagram" && <FaInstagram className="size-7" />}
-            
+                    {app === "youtube" && <FaYoutube className="size-7" />}
+                    {app === "instagram" && <FaInstagram className="size-7" />}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuLabel>{app}</DropdownMenuLabel>
@@ -138,7 +180,24 @@ function Settings() {
               </div>
             ))
           ) : (
-            <>No Apps Connected</>
+            <>
+              <div className="flex flex-col">
+                <p className="mb-4">No Apps Connected</p>
+              </div>
+            </>
+          )}
+        </div>
+        <hr />
+        <div className="flex flex-col md:flex-row mt-4 gap-2">
+          {!apps.youtube && (
+            <Button onClick={() => handleConnect("youtube")}>
+              <FaYoutube className="size-7" /> Connect to YouTube
+            </Button>
+          )}
+          {!apps.instagram && (
+            <Button onClick={() => handleConnect("instagram")}>
+              <FaInstagram className="size-7" /> Connect to Instagram
+            </Button>
           )}
         </div>
       </div>

@@ -3,18 +3,11 @@ import { google } from "googleapis";
 
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import connectToDb from "@/lib/db"; // Use the MongoDB connection utility
+import connectMongoDB from "@/lib/db";
+import User from "@/models/User";
 
 export async function GET(req) {
   try {
-    
-    const client = await connectToDb();
-    console.log("Client: "+ client)
-    const db = await client.db();
-    console.log("DB: "+db)
-    
-
-
     // Extract the code from the query parameters
     const url = new URL(req.url, process.env.NEXTAUTH_URL);
     const code = url.searchParams.get("code");
@@ -47,13 +40,11 @@ export async function GET(req) {
     console.log("heyyyyyyyyy");
     console.log("EMAIL: ", email);
     console.log("TOKENS: ", tokens);
-    await connectToDb();
     // Save the tokens in MongoDB
     try {
+      await connectMongoDB();
      
-      const collection = await db.collection("users");
-
-      await collection.updateOne(
+      const result = await User.updateOne(
         { email },
         {
           $set: {
@@ -61,6 +52,8 @@ export async function GET(req) {
           },
         }
       );
+
+      console.log("updated user connected Apps: ",result)
 
       // await client.close();
 

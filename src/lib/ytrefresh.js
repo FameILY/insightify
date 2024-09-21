@@ -1,6 +1,6 @@
 import { google } from "googleapis";
-import connectToDb from "@/lib/db";
-
+import connectMongoDB from "./db";
+import User from "@/models/User";
 // Refresh the access token using the refresh token
 export async function refreshAccessToken(email) {
   const oauth2Client = new google.auth.OAuth2(
@@ -9,18 +9,16 @@ export async function refreshAccessToken(email) {
     `${process.env.NEXTAUTH_URL}/api/connect/ytcallback`
   );
 
-  // Ensure that the MongoDB client is connected
-  const client = await connectToDb();
-  const db = client.db();
+  await connectMongoDB();
 
   // Find the user by email
-  const user = await db.collection("users").findOne({ email });
+  const user = await User.findOne({ email });
   if (!user) {
     throw new Error("No user found");
   }
 
   // Check if YouTube refresh token exists
-  const youtubeConnection = user.connectedApps?.youtube;
+  const youtubeConnection = user.connectedApps.get('youtube');
   if (!youtubeConnection?.refresh_token) {
     throw new Error("No YouTube refresh token found");
   }
@@ -36,7 +34,7 @@ export async function refreshAccessToken(email) {
     const { access_token, expiry_date } = credentials;
 
     // Update the user's access token and expiry date in the database
-    await db.collection("users").updateOne(
+    await User.updateOne(
       { email },
       {
         $set: {
@@ -48,7 +46,7 @@ export async function refreshAccessToken(email) {
 
     return { access_token, expiry_date };
   } catch (error) {
-    console.error("Error refreshing access token:", error);
+    // console.log("Error refreshing access token:", error);
 
     // Handle specific OAuth errors
     if (error.response?.data?.error === "invalid_grant") {

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import connectToDb from "@/lib/db";
 import { refreshAccessToken } from "@/lib/ytrefresh";
+import connectMongoDB from "@/lib/db";
+import User from "@/models/User";
+
 
 async function fetchYoutubeAnalyticsData(accessToken) {
   const params = new URLSearchParams({
@@ -63,14 +65,14 @@ export async function GET(req) {
   const Authorization = await req.headers.get("Authorization");
   // console.log(Authorization)
 
-  if (Authorization == process.env.NEXT_PUBLIC_API_KEY || !email) {
+  if (Authorization == process.env.NEXT_PUBLIC_API_KEY && email) {
     //geting token from db
-    const client = await connectToDb();
-    console.log("client: ", client)
-    const db = await client.db();
-    const user = await db.collection("users").findOne({ email });
+    await connectMongoDB();
+
+    const user = await User.findOne({ email });
     // console.log("User: ",user)
-    const tokenData = await user.connectedApps.youtube;
+    const tokenData = await user.connectedApps.get('youtube');
+    // console.log("Token Data For Youtube", tokenData)
     if (!user || !tokenData) {
       throw new Error("no token found for user");
     }
@@ -85,7 +87,7 @@ export async function GET(req) {
         tokenData.access_token = access_token;
       } catch (err) {
         return NextResponse.json(
-          { message: "Failed to refresh access token", error: err },
+          { message: "Failed to refresh access token", error: err.message },
           { status: 401 }
         );
       }
@@ -98,10 +100,10 @@ export async function GET(req) {
     const monthlyData = processMonthlyData(data);
     return NextResponse.json({ message: "Success", data: monthlyData }, { status: 200 });
   } catch (error) {
-    return new Response(error, { status: 500 });
+    return NextResponse.json({error: error.message },{ status: 500 });
   }
 } else {
-      return new Response("Unauthorized, no access token", { status: 401 });
+      return NextResponse.json({message: "Unauthorized, no access token"}, { status: 401 });
     }
   } else {
     return NextResponse.json({ message: "Unauthorized" }, { status: 500 });

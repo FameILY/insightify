@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import connectToDb from "@/lib/db";
+import connectMongoDB from "@/lib/db";
+import User from "@/models/User";
 
 export async function GET(req, res) {
   const email = await req.headers.get("email");
   console.log("Email:", email);
-  const client = await connectToDb();
-  const db = client.db();
-  const user = await db.collection("users").findOne({ email });
+  await connectMongoDB();
+
+  const user = await User.findOne({ email });
   // console.log("User: ",user)
 
   if (user) {

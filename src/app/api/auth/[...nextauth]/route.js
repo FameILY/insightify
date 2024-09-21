@@ -1,7 +1,8 @@
 // app/api/auth/[...nextauth]/route.js
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import connectToDb from "@/lib/db"; // Use the MongoDB connection utility
+import User from '@/models/User'
+import connectMongoDB from "@/lib/db";
 
 const options = {
   providers: [
@@ -29,26 +30,22 @@ const options = {
     },
     async signIn({ user, account }) {
       try {
-        const client = await connectToDb();
-        const db = client.db();
-        const collection = db.collection("users");
+        await connectMongoDB()
 
         // Check if user exists
-        const existingUser = await collection.findOne({ email: user.email });
+        const existingUser = await User.findOne({ email: user.email });
 
         // If user doesn't exist, add them to the database
         if (!existingUser) {
-          await collection.insertOne({
+          await User.create({
             email: user.email,
             name: user.name,
             image: user.image,
-            createdAt: new Date(),
             connectedApps: {}, // Initially no apps connected
           });
         }
-        await client.close();
       } catch (error) {
-        console.error("Error inserting user into MongoDB", error);
+        console.error("Error creating user into MongoDB", error);
       }
       return true;
     },
