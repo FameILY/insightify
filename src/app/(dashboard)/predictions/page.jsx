@@ -2,7 +2,7 @@ import React from 'react'
 
 function Prediction() {
   return (
-    <div>Prediction page here</div>
+    <div>Nishant bhay ke liye page here</div>
   )
 }
 
