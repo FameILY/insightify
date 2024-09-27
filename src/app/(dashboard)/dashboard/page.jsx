@@ -46,7 +46,7 @@ export default function Dashboard() {
       method: "GET",
       headers: {
         Authorization: process.env.NEXT_PUBLIC_API_KEY,
-        email: "vu1s2324007@pvppcoe.ac.in",
+        email: session.user.email,
         Accept: "application/json",
       },
     });
