@@ -1,15 +1,10 @@
 "use client";
 import React from "react";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { FaYoutube, FaInstagram, FaTwitter } from "react-icons/fa";
 import { useState } from "react";
-import RadialChart from "@/components/Dashboard/dash/RadialChart";
-
+import Youtube from "@/components/Dashboard/analytics/Youtube";
 function Analytics() {
   const [selectedApp, setSelectedApp] = useState("");
 
@@ -19,15 +14,7 @@ function Analytics() {
         <div className="main-content flex flex-col w-full">
           {selectedApp === "youtube" ? (
             <div className="flex p-4">
-              <RadialChart
-                cardTitle="Radial Chart - Text"
-                cardDescription="January - June 2024"
-                unit="Subscribers"
-                showing="Showing total visitors for the last 6 months"
-                count={250}
-                maxCount={500}
-                color={"#60a5fa"}
-              />
+              <Youtube/>
             </div>
           ) : selectedApp === "instagram" ? (
             <div>Instagram component goes here</div>

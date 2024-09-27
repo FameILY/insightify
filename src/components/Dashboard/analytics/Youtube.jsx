@@ -5,15 +5,17 @@ import { useRouter } from "next/navigation";
 import RadialChart from "@/components/Dashboard/dash/RadialChart";
 import { useState, useEffect } from "react";
 
-export default function Dashboard() {
+export default function Youtube() {
   const { data: session } = useSession();
   const router = useRouter();
   const [subs, setSubs] = new useState("");
   const [maxSubs, setMaxSubs] = new useState("");
   const [views, setViews] = new useState("");
   const [maxViews, setMaxViews] = new useState("");
-
+  const [videoCount, setVideoCount] = new useState("");
+  const [maxVideoCount, setMaxVideoCount] = new useState("");
   const [loading, setLoading] = useState(true);
+
 
   let maxCount;
 
@@ -44,33 +46,35 @@ export default function Dashboard() {
     if (data.message) {
       console.log(data.message);
       // Update subs and views
-      const subscriberCount = parseInt(
-        data.data.items[0].statistics.subscriberCount,
-        10
-      );
-      const viewCount = parseInt(data.data.items[0].statistics.viewCount, 10);
+    const subscriberCount = parseInt(data.data.items[0].statistics.subscriberCount, 10);
+    const viewCount = parseInt(data.data.items[0].statistics.viewCount, 10);
+    const videoCount = parseInt(data.data.items[0].statistics.videoCount, 10);
 
-      setSubs(subscriberCount);
-      setViews(viewCount);
-      
+    
+    setSubs(subscriberCount);
+    setViews(viewCount);
+    setVideoCount(videoCount);
 
-      // Calculate maxSubs and maxViews based on the new values
-      const maxsubs = automateMaxCount(subscriberCount);
-      const maxviews = automateMaxCount(viewCount);
-      setMaxSubs(maxsubs);
-      setMaxViews(maxviews);
-      setLoading(false);
+    // Calculate maxSubs and maxViews based on the new values
+    const maxsubs = automateMaxCount(subscriberCount);
+    const maxviews = automateMaxCount(viewCount);
+    const maxvideocount = automateMaxCount(videoCount);
+
+
+    setMaxSubs(maxsubs);
+    setMaxViews(maxviews);
+    setMaxVideoCount(maxvideocount);
+    setLoading(false)
     }
   };
 
   // Call fetchYtStats only once on component mount
   useEffect(() => {
-    if (session) {
-      // Ensure the session is available before fetching
+    if (session) { // Ensure the session is available before fetching
       fetchYtStats();
     }
   }, [session]); // Only run when the session changes
-
+  
   if (loading) {
     return (
       <div className="flex justify-center items-center w-full">
@@ -101,7 +105,15 @@ export default function Dashboard() {
           color={"#dc2626"}
         />
 
-        
+<RadialChart
+          cardTitle="Videos"
+          cardDescription="Youtube"
+          unit="Videos"
+          showing="Showing total youtube videos"
+          count={videoCount}
+          maxCount={maxVideoCount}
+          color={"#dc2626"}
+        />
       </div>
       <hr />
       <div className="charsomething flex my-4">

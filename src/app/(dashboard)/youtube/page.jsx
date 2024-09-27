@@ -83,7 +83,7 @@ export default function Youtube() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center w-full">
         <span className="loading loading-ring loading-lg"></span>
       </div>
     );
@@ -124,7 +124,7 @@ export default function Youtube() {
   };
 
   return (
-    <div className="flex justify-center items-center flex-col">
+    <div className="flex justify-center items-center flex-col w-full">
        <h1 className="text-5xl font-bold mb-4">YouTube Analytics</h1>
       <Button onClick={fetchData}>Get Data</Button>
       <YouTubeAnalyticsChart monthlyData={monthlyData} />

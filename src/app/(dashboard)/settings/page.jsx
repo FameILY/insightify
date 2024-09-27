@@ -35,7 +35,8 @@ function Settings() {
             Authorization: process.env.NEXT_PUBLIC_API_KEY,
           },
         });
-        console.log(res.json());
+        console.log(await res.json());
+        await router.reload()
       }
       if (account == "instagram") {
         const res = await fetch(`/api/connect/instagramLogout/${userEmail}`, {
@@ -90,7 +91,7 @@ function Settings() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center w-full">
         <span className="loading loading-ring loading-lg"></span>
       </div>
     );
