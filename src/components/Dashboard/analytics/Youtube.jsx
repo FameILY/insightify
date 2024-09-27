@@ -4,6 +4,8 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import RadialChart from "@/components/Dashboard/dash/RadialChart";
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 export default function Youtube() {
   const { data: session } = useSession();
@@ -15,9 +17,18 @@ export default function Youtube() {
   const [videoCount, setVideoCount] = new useState("");
   const [maxVideoCount, setMaxVideoCount] = new useState("");
   const [loading, setLoading] = useState(true);
-
+  const [loginAgain, setLoginAgain] = useState(false);
+  const { toast } = useToast();
 
   let maxCount;
+
+  function handleRedirect() {
+    try {
+      router.push("/settings");
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const automateMaxCount = (count) => {
     if (count < 100) {
@@ -40,41 +51,70 @@ export default function Youtube() {
         Accept: "application/json",
       },
     });
+    if (res.status === 401) {
+      setLoginAgain(true);
+      return
+      // throw new Error("Token expired or unauthorized. Please sign in again.");
+    } 
 
     const data = await res.json();
 
     if (data.message) {
       console.log(data.message);
       // Update subs and views
-    const subscriberCount = parseInt(data.data.items[0].statistics.subscriberCount, 10);
-    const viewCount = parseInt(data.data.items[0].statistics.viewCount, 10);
-    const videoCount = parseInt(data.data.items[0].statistics.videoCount, 10);
+      const subscriberCount = parseInt(
+        data.data.items[0].statistics.subscriberCount,
+        10
+      );
+      const viewCount = parseInt(data.data.items[0].statistics.viewCount, 10);
+      const videoCount = parseInt(data.data.items[0].statistics.videoCount, 10);
 
-    
-    setSubs(subscriberCount);
-    setViews(viewCount);
-    setVideoCount(videoCount);
+      setSubs(subscriberCount);
+      setViews(viewCount);
+      setVideoCount(videoCount);
 
-    // Calculate maxSubs and maxViews based on the new values
-    const maxsubs = automateMaxCount(subscriberCount);
-    const maxviews = automateMaxCount(viewCount);
-    const maxvideocount = automateMaxCount(videoCount);
+      // Calculate maxSubs and maxViews based on the new values
+      const maxsubs = automateMaxCount(subscriberCount);
+      const maxviews = automateMaxCount(viewCount);
+      const maxvideocount = automateMaxCount(videoCount);
 
-
-    setMaxSubs(maxsubs);
-    setMaxViews(maxviews);
-    setMaxVideoCount(maxvideocount);
-    setLoading(false)
+      setMaxSubs(maxsubs);
+      setMaxViews(maxviews);
+      setMaxVideoCount(maxvideocount);
+      setLoading(false);
     }
   };
 
   // Call fetchYtStats only once on component mount
   useEffect(() => {
-    if (session) { // Ensure the session is available before fetching
+    if (session) {
+      // Ensure the session is available before fetching
       fetchYtStats();
     }
   }, [session]); // Only run when the session changes
-  
+
+  // Handle token expiration
+  useEffect(() => {
+    if (loginAgain) {
+      toast({
+        variant: "destructive",
+        title: "Oops, you need to login to YouTube again!",
+        description:
+          "Your token has expired. This could be due to a password change or you removed this app's permission to access your YouTube data.",
+        action: (
+          <ToastAction
+            onClick={handleRedirect}
+            altText="Login to YouTube Again"
+          >
+            Login
+          </ToastAction>
+        ),
+      });
+
+      setLoginAgain(false);
+    }
+  }, [loginAgain, toast]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center w-full">
@@ -105,7 +145,7 @@ export default function Youtube() {
           color={"#dc2626"}
         />
 
-<RadialChart
+        <RadialChart
           cardTitle="Videos"
           cardDescription="Youtube"
           unit="Videos"

@@ -73,7 +73,7 @@ export default function Youtube() {
         description:
           "Your token has expired. This could be due to a password change or you removed this app's permission to access your YouTube data.",
         action: (
-          <ToastAction altText="Login to YouTube Again">Login</ToastAction>
+          <ToastAction onClick={handleRedirect} altText="Login to YouTube Again">Login</ToastAction>
         ),
       });
 

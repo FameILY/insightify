@@ -35,8 +35,8 @@ function Settings() {
             Authorization: process.env.NEXT_PUBLIC_API_KEY,
           },
         });
-        console.log(await res.json());
-        await router.reload()
+        // console.log(await res.json());
+        await window.location.reload()
       }
       if (account == "instagram") {
         const res = await fetch(`/api/connect/instagramLogout/${userEmail}`, {

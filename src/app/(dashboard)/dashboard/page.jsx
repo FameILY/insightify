@@ -4,16 +4,28 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import RadialChart from "@/components/Dashboard/dash/RadialChart";
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 export default function Dashboard() {
   const { data: session } = useSession();
   const router = useRouter();
+  const [loginAgain, setLoginAgain] = useState(false);
+  const { toast } = useToast();
   const [subs, setSubs] = new useState("");
   const [maxSubs, setMaxSubs] = new useState("");
   const [views, setViews] = new useState("");
   const [maxViews, setMaxViews] = new useState("");
 
   const [loading, setLoading] = useState(true);
+
+  function handleRedirect() {
+    try {
+      router.push("/settings");
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   let maxCount;
 
@@ -34,10 +46,15 @@ export default function Dashboard() {
       method: "GET",
       headers: {
         Authorization: process.env.NEXT_PUBLIC_API_KEY,
-        email: session.user.email,
+        email: "vu1s2324007@pvppcoe.ac.in",
         Accept: "application/json",
       },
     });
+    if (res.status === 401) {
+      setLoginAgain(true);
+      return
+      // throw new Error("Token expired or unauthorized. Please sign in again.");
+    } 
 
     const data = await res.json();
 
@@ -70,6 +87,23 @@ export default function Dashboard() {
       fetchYtStats();
     }
   }, [session]); // Only run when the session changes
+
+  // Handle token expiration
+  useEffect(() => {
+    if (loginAgain) {
+      toast({
+        variant: "destructive",
+        title: "Oops, you need to login to YouTube again!",
+        description:
+          "Your token has expired. This could be due to a password change or you removed this app's permission to access your YouTube data.",
+        action: (
+          <ToastAction onClick={handleRedirect} altText="Login to YouTube Again">Login</ToastAction>
+        ),
+      });
+
+      setLoginAgain(false)
+    }
+  }, [loginAgain, toast]);
 
   if (loading) {
     return (

@@ -36,13 +36,13 @@ export async function GET(req) {
     const user = await User.findOne({ email });
 
     if (!user){
-      return NextResponse.json({message: "User not found"})
+      return NextResponse.json({message: "User not found"}, {status: 401})
     }
 
     const tokenData = await user.connectedApps.get('youtube');
 
     if (!tokenData) {
-      return NextResponse.json({message: "No Token found for the user"})
+      return NextResponse.json({message: "No Token found for the user"}, {status: 401})
     }
 
     const isTokenExpired = Date.now() > tokenData.expiry_date;
