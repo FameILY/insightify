@@ -6,6 +6,8 @@ import RadialChart from "@/components/Dashboard/dash/RadialChart";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import YouTubeAnalyticsChart from '@/components/youtube/charts';
+
 
 export default function Youtube() {
   const { data: session } = useSession();
@@ -19,6 +21,9 @@ export default function Youtube() {
   const [loading, setLoading] = useState(true);
   const [loginAgain, setLoginAgain] = useState(false);
   const { toast } = useToast();
+  const [monthlyYtData, setMonthlyYtData] = useState(0);
+
+  
 
   let maxCount;
 
@@ -85,11 +90,46 @@ export default function Youtube() {
     }
   };
 
+
+  const fetchSubsChart = async () => {
+    try {
+      const res = await fetch("/api/youtube", {
+        headers: {
+          Authorization: process.env.NEXT_PUBLIC_API_KEY,
+          email: session.user.email,
+          Accept: "application/json",
+        },
+      });
+
+      if (res.status === 401) {
+        setLoginAgain(true);
+        // throw new Error("Token expired or unauthorized. Please sign in again.");
+      }
+
+      const data = await res.json();  
+      const formattedMonthlyData = Object.entries(data.data).map(([month, metrics]) => ({
+        month,
+        views: metrics.views,
+        subscribersGained: metrics.subscribersGained,
+      }));
+      setMonthlyYtData(formattedMonthlyData);
+      // toast({
+
+      //   title: "Data Fetched Successfully",
+      //   description: "The data has been fetched successfully.",
+      //   action: <ToastAction altText="OK">OK</ToastAction>,
+      // });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // Call fetchYtStats only once on component mount
   useEffect(() => {
     if (session) {
       // Ensure the session is available before fetching
       fetchYtStats();
+      fetchSubsChart()
     }
   }, [session]); // Only run when the session changes
 
@@ -117,7 +157,7 @@ export default function Youtube() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center w-full">
+      <div className="flex justify-center items-center w-full h-screen">
         <span className="loading loading-ring loading-lg"></span>
       </div>
     );
@@ -156,8 +196,10 @@ export default function Youtube() {
         />
       </div>
       <hr />
-      <div className="charsomething flex my-4">
-        <p>graph of some kind here</p>
+      <div className="charsomething flex flex-col my-4 justify-center">
+        {/* <p>Subscribers and Views in the year: </p> */}
+      <YouTubeAnalyticsChart monthlyData={monthlyYtData} />
+
       </div>
       <hr />
       <div className="charsomething flex my-4">

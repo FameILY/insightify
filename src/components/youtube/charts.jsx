@@ -88,14 +88,15 @@ const YouTubeAnalyticsChart = ({ monthlyData }) => {
               tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
+              
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <Bar dataKey="subscribersGained" fill="var(--color-subscribersGained)" radius={4}>
-            <LabelList dataKey="subscribersGained" position="top" />
+            <LabelList dataKey="subscribersGained" position="top" className="hidden md:block"/>
             </Bar>
             <Bar dataKey="views" fill="var(--color-views)" radius={4} >
-            <LabelList dataKey="views" position="top" />
+            <LabelList dataKey="views" position="top" className="hidden md:block"/>
             </Bar>
 
           </BarChart>

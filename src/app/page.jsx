@@ -10,9 +10,10 @@ import { ReactLenis, useLenis } from '@studio-freight/react-lenis'
 
 
 const Home = () => {
-  const lenis = useLenis(({ scroll }) => {
-    // called every scroll
-  })
+  // const lenis = useLenis(({ scroll }) => {
+  //   // called every scroll
+  
+  // })
   return (
     <>
     <ReactLenis root>
