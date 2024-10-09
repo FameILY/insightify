@@ -11,7 +11,7 @@ function Analytics() {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex flex-col-reverse  gap-4 md:flex-row md:justify-between w-full">
+      <div className="flex relative flex-col-reverse  gap-4 md:flex-row md:justify-between w-full">
         <div className="main-content flex flex-col w-full">
           {selectedApp === "youtube" ? (
             <div className="flex p-4">
@@ -26,7 +26,7 @@ function Analytics() {
           )}
         </div>
 
-        <div className="app-chooser flex flex-col ">
+        <div className="app-chooser flex flex-col sticky top-0 z-10 backdrop-blur-md bg-opacity-70">
           <p className="text-xl font-semibold text-nowrap mb-4">Your Apps</p>
           <hr />
 

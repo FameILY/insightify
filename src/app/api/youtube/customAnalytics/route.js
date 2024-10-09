@@ -38,8 +38,10 @@ export async function POST(req) {
 
   
   if (Authorization == process.env.NEXT_PUBLIC_API_KEY && email) {
-      //geting token from db
-      const paramData = await req.json()
+
+    //geting token from db
+    const paramData = await req.json()
+    console.log("PARAM DATA: ",paramData)
       if(!paramData.startDate) {
         return NextResponse.json({message: "startDate needed"})
       }
