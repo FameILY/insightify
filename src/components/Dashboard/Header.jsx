@@ -59,8 +59,10 @@ function Header({ mainContent }) {
 
   return (
     <>
-      <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-        <div className="hidden border-r bg-muted/40 md:block max-h-screen">
+      {/* <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]"> */}
+      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[1fr] xl:grid-cols-[220px_1fr] 2xl:grid-cols-[280px_1fr]">
+
+        <div className="hidden border-r bg-muted/40 xl:block max-h-screen">
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
               <Link href="/" className="flex items-center gap-2 font-semibold">
@@ -160,7 +162,7 @@ function Header({ mainContent }) {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="shrink-0 md:hidden"
+                  className="shrink-0 lg:block xl:hidden"
                 >
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">Toggle navigation menu</span>

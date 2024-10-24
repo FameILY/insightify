@@ -28,7 +28,7 @@ const Home = () => {
           body="Gain a complete overview of your social media presence. Track
             performance metrics, compare platforms, and understand what content
             works best—across YouTube, Instagram, X, and LinkedIn."
-          image="/banner.png"
+          image="/giphy.webp"
         />
         <Feature
           head="Predictive Insights"
@@ -38,7 +38,7 @@ const Home = () => {
         <Feature
           head="Custom Reports"
           body="Create detailed, professional reports that highlight your social media growth and performance. Export data, visualize trends, and share insights with your team or clients."
-          image="/banner.png"
+          image="/reportcropped.gif"
         />
         <Feature
           head="Detailed Post Analysis"

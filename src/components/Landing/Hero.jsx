@@ -57,7 +57,7 @@ const Hero = () => {
         <div className="mockup-window  dark:bg-zinc-950 border mt-6 mb-6">
           <div className="dark:bg-zinc-900 flex justify-center">
             <Image
-              src="/banner.png"
+              src="/bannernew.png"
               alt="hello"
               width={500}
               height={500}
