@@ -6,8 +6,8 @@ import RadialChart from "@/components/Dashboard/dash/RadialChart";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import YouTubeAnalyticsChart from '@/components/youtube/charts';
-
+import YouTubeAnalyticsChart from "@/components/youtube/charts";
+import RecentVideo from "@/components/youtube/recentVideo";
 
 export default function Youtube() {
   const { data: session } = useSession();
@@ -22,8 +22,9 @@ export default function Youtube() {
   const [loginAgain, setLoginAgain] = useState(false);
   const { toast } = useToast();
   const [monthlyYtData, setMonthlyYtData] = useState(0);
+  const [latestVideo, setLatestVideo] = useState("")
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  
 
   let maxCount;
 
@@ -58,9 +59,9 @@ export default function Youtube() {
     });
     if (res.status === 401) {
       setLoginAgain(true);
-      return
+      return;
       // throw new Error("Token expired or unauthorized. Please sign in again.");
-    } 
+    }
 
     const data = await res.json();
 
@@ -90,7 +91,6 @@ export default function Youtube() {
     }
   };
 
-
   const fetchSubsChart = async () => {
     try {
       const res = await fetch("/api/youtube", {
@@ -106,12 +106,14 @@ export default function Youtube() {
         // throw new Error("Token expired or unauthorized. Please sign in again.");
       }
 
-      const data = await res.json();  
-      const formattedMonthlyData = Object.entries(data.data).map(([month, metrics]) => ({
-        month,
-        views: metrics.views,
-        subscribersGained: metrics.subscribersGained,
-      }));
+      const data = await res.json();
+      const formattedMonthlyData = Object.entries(data.data).map(
+        ([month, metrics]) => ({
+          month,
+          views: metrics.views,
+          subscribersGained: metrics.subscribersGained,
+        })
+      );
       setMonthlyYtData(formattedMonthlyData);
       // toast({
 
@@ -124,12 +126,54 @@ export default function Youtube() {
     }
   };
 
+  const fetchLatestVideoMetrics = async () => {
+    try {
+      const res = await fetch("/api/youtube/latestVideo", {
+        headers: {
+          Authorization: process.env.NEXT_PUBLIC_API_KEY,
+          email: session.user.email,
+          Accept: "application/json",
+        },
+      });
+
+      if (res.status === 401) {
+        setLoginAgain(true);
+        // throw new Error("Token expired or unauthorized. Please sign in again.");
+      }
+
+      const data = await res.json();
+      setLatestVideo(data)
+      // console.log("HEYYY")
+      // console.log(latestVideo.data.snippet.title)
+      // console.log(latestVideo.data.statistics.viewCount)
+      
+     
+      // toast({
+
+      //   title: "Data Fetched Successfully",
+      //   description: "The data has been fetched successfully.",
+      //   action: <ToastAction altText="OK">OK</ToastAction>,
+      // });
+    } catch (error) {
+      console.error(error);
+    }
+    
+  }
+
   // Call fetchYtStats only once on component mount
   useEffect(() => {
     if (session) {
       // Ensure the session is available before fetching
-      fetchYtStats();
-      fetchSubsChart()
+      const fetchData = async () => {
+        setLoading(true);
+        await fetchYtStats();
+        await fetchSubsChart();
+        await fetchLatestVideoMetrics();
+        setDataLoaded(true); // Mark data as loaded once both requests finish
+        setLoading(false);
+      };
+
+      fetchData();
     }
   }, [session]); // Only run when the session changes
 
@@ -155,7 +199,7 @@ export default function Youtube() {
     }
   }, [loginAgain, toast]);
 
-  if (loading) {
+  if (loading || !dataLoaded) {
     return (
       <div className="flex justify-center items-center w-full h-screen">
         <span className="loading loading-ring loading-lg"></span>
@@ -198,12 +242,21 @@ export default function Youtube() {
       <hr />
       <div className="charsomething flex flex-col my-4 justify-center">
         {/* <p>Subscribers and Views in the year: </p> */}
-      <YouTubeAnalyticsChart monthlyData={monthlyYtData} />
-
+        <YouTubeAnalyticsChart monthlyData={monthlyYtData} />
       </div>
       <hr />
       <div className="charsomething flex my-4">
-        <p>Recent Post Metrics here</p>
+        
+        <RecentVideo 
+        src={latestVideo.data.snippet.thumbnails.maxres.url} 
+        title={latestVideo.data.snippet.title}
+        views={latestVideo.data.statistics.viewCount}
+        likes={latestVideo.data.statistics.likeCount}
+        dislikes={latestVideo.data.statistics.dislikeCount}
+        favorites={latestVideo.data.statistics.favoriteCount}
+        comments={latestVideo.data.statistics.commentCount}
+
+        />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import RadialChart from "@/components/Dashboard/dash/RadialChart";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import ViewAndSubLineGraph from "@/components/youtube/lineGraph"
 
 export default function Dashboard() {
   const { data: session } = useSession();
@@ -16,8 +17,10 @@ export default function Dashboard() {
   const [maxSubs, setMaxSubs] = new useState("");
   const [views, setViews] = new useState("");
   const [maxViews, setMaxViews] = new useState("");
+  const[ dataForLine, setDataForLine ] = new useState("");
 
   const [loading, setLoading] = useState(true);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   function handleRedirect() {
     try {
@@ -80,13 +83,47 @@ export default function Dashboard() {
     }
   };
 
-  // Call fetchYtStats only once on component mount
+  const fetchDataForLine = async () => {
+
+    const res = await fetch("/api/youtube/forLine", {
+      method: "GET",
+      headers: {
+        Authorization: process.env.NEXT_PUBLIC_API_KEY,
+        email: session.user.email,
+        Accept: "application/json",
+      },
+    });
+    if (res.status === 401) {
+      setLoginAgain(true);
+      return
+      // throw new Error("Token expired or unauthorized. Please sign in again.");
+    } 
+
+    const data = await res.json();
+
+    if (data.message) {
+      console.log(data.message);
+      
+      setDataForLine(data.data)
+      setLoading(false);
+    }
+
+  }
+
   useEffect(() => {
     if (session) {
       // Ensure the session is available before fetching
-      fetchYtStats();
+      const fetchData = async () => {
+        setLoading(true);
+        await fetchYtStats();
+        await fetchDataForLine();
+        setDataLoaded(true); // Mark data as loaded once both requests finish
+        setLoading(false);
+      };
+
+      fetchData();
     }
-  }, [session]); // Only run when the session changes
+  }, [session]);
 
   // Handle token expiration
   useEffect(() => {
@@ -105,7 +142,7 @@ export default function Dashboard() {
     }
   }, [loginAgain, toast]);
 
-  if (loading) {
+  if (loading || !dataLoaded) {
     return (
       <div className="flex justify-center items-center w-full">
         <span className="loading loading-ring loading-lg"></span>
@@ -138,13 +175,15 @@ export default function Dashboard() {
         
       </div>
       <hr />
-      <div className="charsomething flex my-4">
-        <p>graph of some kind here</p>
+      <div className="charsomething my-4">
+      <ViewAndSubLineGraph
+      chartData={dataForLine}
+      />
       </div>
-      <hr />
-      <div className="charsomething flex my-4">
+      {/* <hr /> */}
+      {/* <div className="charsomething flex my-4">
         <p>Recent Post Metrics here</p>
-      </div>
+      </div> */}
     </div>
   );
 }

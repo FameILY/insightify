@@ -18,11 +18,11 @@ function Analytics() {
               <Youtube/>
             </div>
           ) : selectedApp === "instagram" ? (
-            <div>Instagram component goes here</div>
+            <div>Stay Tuned for Instagram Integration</div>
           ) : selectedApp === "x" ? (
-            <div>X component goes here</div>
+            <div>Stay Tuned for X Integration</div>
           ) : (
-            <div>Nothing component goes here</div>
+            <div>Click on your app to get started!</div>
           )}
         </div>
 
