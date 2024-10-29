@@ -23,7 +23,7 @@ export const fetchInstagramAccountId = async (accessToken) => {
 };
 
 export const fetchInstagramAccountDetails = async (igAccountId, accessToken) => {
-    const response = await fetch(`https://graph.facebook.com/v12.0/${igAccountId}?fields=username,profile_picture_url,followers_count&access_token=${accessToken}`);
+    const response = await fetch(`https://graph.facebook.com/v21.0/${igAccountId}?fields=username,profile_picture_url,followers_count&access_token=${accessToken}`);
     
     if (!response.ok) {
         const errorData = await response.json();
