@@ -15,8 +15,8 @@ function Prediction() {
     };
 
     const fetchLongLivedToken = async (shortLivedToken) => {
-        const appId = '556416126937462'; // Replace with your app ID
-        const appSecret = '65ce439fb1c1f6e8d6b3b5efd892a410'; // Replace with your app secret
+        const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID; // Replace with your app ID
+        const appSecret = process.env.NEXT_PUBLIC_FACEBOOK_APP_SECRET; // Replace with your app secret
 
         const response = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${shortLivedToken}`);
 
