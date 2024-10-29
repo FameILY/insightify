@@ -87,7 +87,7 @@ function Prediction() {
                 <div>
                     <h2>Account Details</h2>
                     <img src={accountDetails.profile_picture_url} alt="Profile" />
-                    <p>Name: {accountDetails.name}</p>
+                    <p>Name: {accountDetails.username}</p>
                     <p>Followers: {accountDetails.followers_count}</p>
                 </div>
             )}
