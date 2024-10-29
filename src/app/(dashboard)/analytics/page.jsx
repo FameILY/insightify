@@ -6,6 +6,7 @@ import { FaYoutube, FaInstagram, FaTwitter } from "react-icons/fa";
 import { useState } from "react";
 
 import Youtube from "@/components/Dashboard/analytics/Youtube";
+import Instagram from "@/components/Dashboard/analytics/Instagram";
 function Analytics() {
   const [selectedApp, setSelectedApp] = useState("");
 
@@ -18,7 +19,7 @@ function Analytics() {
               <Youtube/>
             </div>
           ) : selectedApp === "instagram" ? (
-            <div>Stay Tuned for Instagram Integration</div>
+            <Instagram/>
           ) : selectedApp === "x" ? (
             <div>Stay Tuned for X Integration</div>
           ) : (
