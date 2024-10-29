@@ -2,9 +2,9 @@
 
 // Function to initiate Facebook Login
 export const initiateFacebookLogin = () => {
-    const clientId = '556416126937462'; // Replace with your Facebook App ID
-    const redirectUri = 'http://localhost:3000/predictions';
-    const configid= '935191661788190' // Redirect to your app's base URL
+    const clientId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID; // Replace with your Facebook App ID
+    const redirectUri = process.env.NEXT_PUBLIC_FACEBOOK_APP_REDIRECT_URI;
+    const configid = process.env.NEXT_PUBLIC_FACEBOOK_APP_CONFIG_ID; // Redirect to your app's base URL
     const scope = 'instagram_basic,pages_show_list,business_management,read_insights,instagram_manage_insights,pages_read_engagement'; // Permissions you want to request
 
     const loginUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&config_id=${configid}&scope=${scope}&response_type=token`;
