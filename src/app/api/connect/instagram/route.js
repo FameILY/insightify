@@ -1,6 +1,6 @@
 //api for facebook login (instagram)
 import { NextResponse } from "next/server";
-
+ 
 export async function GET() {
   const params = new URLSearchParams({
     client_id: process.env.FACEBOOK_APP_ID,
