@@ -16,8 +16,8 @@ export const fetchInstagramAccountId = async (accessToken) => {
 
 
 const fetchLongLivedToken = async (shortLivedToken) => {
-  const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID; // Replace with your app ID
-  const appSecret = process.env.NEXT_PUBLIC_FACEBOOK_APP_SECRET; // Replace with your app secret
+  const appId = process.env.FACEBOOK_APP_ID; // Replace with your app ID
+  const appSecret = process.env.FACEBOOK_APP_SECRET; // Replace with your app secret
   console.log(appId, appSecret);
 
   const response = await fetch(
