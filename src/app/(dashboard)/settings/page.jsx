@@ -45,7 +45,9 @@ function Settings() {
             Authorization: process.env.NEXT_PUBLIC_API_KEY,
           },
         });
+        await window.location.reload()
       }
+
     }
   };
 
@@ -163,8 +165,8 @@ function Settings() {
                 {/* {console.log("Apps: ",apps)} */}
                 <DropdownMenu>
                   <DropdownMenuTrigger>
-                    {app === "youtube" && <FaYoutube className="size-7" />}
-                    {app === "instagram" && <FaInstagram className="size-7" />}
+                    {app === "youtube" && <FaYoutube className="size-7 mx-2" />}
+                    {app === "instagram" && <FaInstagram className="size-7 mx-2" />}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuLabel>{app}</DropdownMenuLabel>

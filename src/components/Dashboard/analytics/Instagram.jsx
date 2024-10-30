@@ -1,101 +1,144 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import Insights from '@/components/facebook/insights';
-import { initiateFacebookLogin, fetchInstagramAccountId, fetchInstagramAccountDetails } from '@/app/api/facebook/api';
+import { useState, useEffect } from "react";
+
+import { signIn, signOut, useSession } from "next-auth/react";
+
+import Insights from "@/components/facebook/Insights";
+import { ToastAction } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+
+import Image from "next/image";
 function Instagram() {
-    const [accessToken, setAccessToken] = useState(null);
-    const [igAccountId, setIgAccountId] = useState(null);
-    const [accountDetails, setAccountDetails] = useState(null);
-    const [showInsights, setShowInsights] = useState(false);
-    const [error, setError] = useState(null);
+  const { data: session } = useSession();
+  const router = useRouter();
 
-    const handleLoginClick = async () => {
-        initiateFacebookLogin();
-    };
+  const [loading, setLoading] = useState(true);
+  const [loginAgain, setLoginAgain] = useState(false);
+  const { toast } = useToast();
+  const [accountDetails, setAccountDetails] = useState(null);
 
-    const fetchLongLivedToken = async (shortLivedToken) => {
-        const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID; // Replace with your app ID
-        const appSecret = process.env.NEXT_PUBLIC_FACEBOOK_APP_SECRET; // Replace with your app secret
-        console.log(appId, appSecret)
+  const [error, setError] = useState(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-        const response = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${shortLivedToken}`);
+  function handleRedirect() {
+    try {
+      router.push("/settings");
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Failed to fetch long-lived token: ${errorData.error.message}`);
-        }
+  const fetchAccountDetails = async () => {
+    try {
+      // Fetch account details
+      const res = await fetch("/api/instagram/instaStats", {
+        method: "GET",
+        headers: {
+          Authorization: process.env.NEXT_PUBLIC_API_KEY,
+          email: session.user.email,
+          Accept: "application/json",
+        },
+      });
 
-        const data = await response.json();
-        return data.access_token;
-        
-    };
+      if (res.status === 401) {
+        setLoginAgain(true);
+        return;
+        // throw new Error("Token expired or unauthorized. Please sign in again.");
+      }
 
-    const handleFetchInsightsClick = async () => {
-        const hash = window.location.hash;
-        const params = new URLSearchParams(hash.replace('#', '?'));
-        const shortLivedToken = params.get('access_token');
+      const data = await res.json();
+      setAccountDetails(data.data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-        if (shortLivedToken) {
-            try {
-                // Fetch long-lived token
-                const longLivedToken = await fetchLongLivedToken(shortLivedToken);
-                console.log('Long-Lived Access Token:', longLivedToken);
-                setAccessToken(longLivedToken); // Set the long-lived token
 
-                const pages = await fetchInstagramAccountId(longLivedToken);
-                const instagramPage = pages.find(page => page.instagram_business_account);
-                if (instagramPage) {
-                    const igAccountId = instagramPage.instagram_business_account.id;
-                    setIgAccountId(igAccountId);
-                    setShowInsights(true);
+  
+  // Call fetchYtStats only once on component mount
+  useEffect(() => {
+    if (session) {
+      // Ensure the session is available before fetching
+      const fetchData = async () => {
+        setLoading(true);
+        await fetchAccountDetails();
+     
+        setDataLoaded(true); // Mark data as loaded once both requests finish
+        setLoading(false);
+      };
 
-                    // Fetch account details
-                    const details = await fetchInstagramAccountDetails(igAccountId, longLivedToken);
-                    setAccountDetails(details);
-                } else {
-                    setError('No Instagram Business Account found');
-                }
-            } catch (err) {
-                setError(err.message);
-            }
-        } else {
-            setError('Access token not found. Please log in.');
-        }
-    };
+      fetchData();
+    }
+  }, [session]); // Only run when the session changes
 
-    // Check for access token on component mount
-    useEffect(() => {
-        const hash = window.location.hash;
-        const params = new URLSearchParams(hash.replace('#', '?'));
-        const token = params.get('access_token');
-        if (token) {
-            setAccessToken(token);
-        }
-    }, []); // Run once on mount
 
-    return (
-        <div className='flex flex-col justify-center items-center w-full '>
-            <h1>Instagram Initial Tests (only for developers and testers)</h1>
-            <Button className="m-4" onClick={handleLoginClick}>Login with Facebook</Button>
-            <Button className="m-4" onClick={handleFetchInsightsClick} disabled={!accessToken}>
-                Fetch Insights
-            </Button>
-            
-            {/* Conditionally render the account details */}
-            {accountDetails && (
-                <div>
-                    <h2>Account Details</h2>
-                    <img src={accountDetails.profile_picture_url} alt="Profile" />
-                    <p>Name: {accountDetails.name}</p>
-                    <p>Followers: {accountDetails.followers_count}</p>
-                </div>
-            )}
-            {/* Conditionally render the Insights component */}
-            {showInsights && <Insights igMediaId={igAccountId} accessToken={accessToken} />}
-            {error && <div>Error: {error}</div>}
+ // Handle token expiration
+ useEffect(() => {
+  if (loginAgain) {
+    toast({
+      variant: "destructive",
+      title: "Oops, you need to login to Instagram again!",
+      description:
+        "Your token has expired. This could be due to a password change or you removed this app's permission to access your Instagram data.",
+      action: (
+        <ToastAction
+          onClick={handleRedirect}
+          altText="Login to Instagram Again"
+        >
+          Login
+        </ToastAction>
+      ),
+    });
+
+    setLoginAgain(false);
+  }
+}, [loginAgain, toast]);
+
+
+if (loading || !dataLoaded) {
+  return (
+    <div className="flex justify-center items-center w-full h-screen">
+      <span className="loading loading-ring loading-lg"></span>
+    </div>
+  );
+}
+
+  return (
+    <div className="flex flex-col justify-center items-center w-full ">
+      <h1>Instagram Initial Tests (only for developers and testers)</h1>
+
+      {/* Conditionally render the account details */}
+      {accountDetails && (
+        <div>
+          <h2>Account Details</h2>
+          <Image
+            className="rounded-full h-20 w-20"
+            src={accountDetails.profile_picture_url}
+            alt="Profile"
+            width={500}
+            height={500}
+          />
+          <p>Name: {accountDetails.username}</p>
+          <p>Followers: {accountDetails.followers_count}</p>
+          <p>Following: {accountDetails.follows_count}</p>
+          <p>Website: {accountDetails.website}</p>
+          <p>Bio: {accountDetails.biography}</p>
+
+
+
         </div>
-    );
-};
+      )}
+      {/* Conditionally render the Insights component */}
+      <div className="flex h-96 w-96 overflow-y-auto">
+
+          <Insights />
+        </div>
+      
+      {error && <div>Error: {error}</div>}
+    </div>
+  );
+}
 
 export default Instagram;
