@@ -22,9 +22,10 @@ export default function Youtube() {
   const [loginAgain, setLoginAgain] = useState(false);
   const { toast } = useToast();
   const [monthlyYtData, setMonthlyYtData] = useState(0);
-  const [latestVideo, setLatestVideo] = useState("")
+  const [latestVideo, setLatestVideo] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
-
+  const [channelExist, setChannelExist] = useState(false);
+  const [noVideoYet, setNoVideoYet] = useState(false);
 
   let maxCount;
 
@@ -65,7 +66,9 @@ export default function Youtube() {
 
     const data = await res.json();
 
-    if (data.message) {
+    if (data.message && data.data.items) {
+      setChannelExist(true);
+
       console.log(data.message);
       // Update subs and views
       const subscriberCount = parseInt(
@@ -88,6 +91,8 @@ export default function Youtube() {
       setMaxViews(maxviews);
       setMaxVideoCount(maxvideocount);
       setLoading(false);
+    } else {
+      setChannelExist(false);
     }
   };
 
@@ -107,20 +112,27 @@ export default function Youtube() {
       }
 
       const data = await res.json();
-      const formattedMonthlyData = Object.entries(data.data).map(
-        ([month, metrics]) => ({
-          month,
-          views: metrics.views,
-          subscribersGained: metrics.subscribersGained,
-        })
-      );
-      setMonthlyYtData(formattedMonthlyData);
-      // toast({
 
-      //   title: "Data Fetched Successfully",
-      //   description: "The data has been fetched successfully.",
-      //   action: <ToastAction altText="OK">OK</ToastAction>,
-      // });
+      if (data.data.length > 0) {
+        setChannelExist(true);
+        console.log("EXISTS");
+        const formattedMonthlyData = Object.entries(data.data).map(
+          ([month, metrics]) => ({
+            month,
+            views: metrics.views,
+            subscribersGained: metrics.subscribersGained,
+          })
+        );
+        setMonthlyYtData(formattedMonthlyData);
+        // toast({
+
+        //   title: "Data Fetched Successfully",
+        //   description: "The data has been fetched successfully.",
+        //   action: <ToastAction altText="OK">OK</ToastAction>,
+        // });
+      } else {
+        setChannelExist(false);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -142,23 +154,28 @@ export default function Youtube() {
       }
 
       const data = await res.json();
-      setLatestVideo(data)
-      // console.log("HEYYY")
-      // console.log(latestVideo.data.snippet.title)
-      // console.log(latestVideo.data.statistics.viewCount)
-      
-     
-      // toast({
+      console.log("DATAAAAAAAAA:", data);
+      if (data.data) {
+        setChannelExist(true);
 
-      //   title: "Data Fetched Successfully",
-      //   description: "The data has been fetched successfully.",
-      //   action: <ToastAction altText="OK">OK</ToastAction>,
-      // });
+        setLatestVideo(data);
+        // console.log("HEYYY")
+        // console.log(latestVideo.data.snippet.title)
+        // console.log(latestVideo.data.statistics.viewCount)
+
+        // toast({
+
+        //   title: "Data Fetched Successfully",
+        //   description: "The data has been fetched successfully.",
+        //   action: <ToastAction altText="OK">OK</ToastAction>,
+        // });
+      } else {
+        setNoVideoYet(true);
+      }
     } catch (error) {
       console.error(error);
     }
-    
-  }
+  };
 
   // Call fetchYtStats only once on component mount
   useEffect(() => {
@@ -206,6 +223,61 @@ export default function Youtube() {
       </div>
     );
   }
+
+  if (!channelExist) {
+    return (
+      <>
+        <div className="flex flex-col w-full relative">
+          <div className="counters flex flex-row flex-wrap md:flex md:flex-wrap justify-center gap-3 mb-4">
+            <div className="skeleton h-32 w-32"></div>
+
+            <div className="skeleton h-32 w-32"></div>
+
+            <div className="skeleton h-32 w-32"></div>
+          </div>
+          <hr />
+          <div className="charsomething flex flex-col my-4 justify-center">
+            <div className="flex w-full flex-col gap-4">
+              <div className="skeleton h-32 w-full"></div>
+              <div className="skeleton h-4 w-28"></div>
+              <div className="skeleton h-4 w-full"></div>
+              <div className="skeleton h-4 w-full"></div>
+            </div>
+          </div>
+          <hr />
+          <div className="charsomething flex my-4">
+            <div className="flex w-full flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <div className="skeleton h-16 w-16 shrink-0 rounded-full"></div>
+                <div className="flex flex-col gap-4">
+                  <div className="skeleton h-4 w-20"></div>
+                  <div className="skeleton h-4 w-28"></div>
+                </div>
+              </div>
+              <div className="skeleton h-32 w-full"></div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute w-4/5 flex justify-center items-center">
+          <div className="hero min-h-screen">
+            <div className="hero-content text-center">
+              <div className="max-w-md">
+                <h1 className="text-5xl font-bold">
+                  You dont have a channel yet!
+                </h1>
+                <p className="py-6">
+                  You can logout and login with a account with a channel
+                  associated here!
+                </p>
+                <a href="/settings"><Button className="">Login with Another Channel</Button></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <div className="flex flex-col w-full">
       <div className="counters flex flex-row flex-wrap md:flex md:flex-wrap justify-center gap-3 mb-4">
@@ -246,17 +318,33 @@ export default function Youtube() {
       </div>
       <hr />
       <div className="charsomething flex my-4">
-        
-        <RecentVideo 
-        src={latestVideo.data.snippet.thumbnails.maxres.url} 
-        title={latestVideo.data.snippet.title}
-        views={latestVideo.data.statistics.viewCount}
-        likes={latestVideo.data.statistics.likeCount}
-        dislikes={latestVideo.data.statistics.dislikeCount}
-        favorites={latestVideo.data.statistics.favoriteCount}
-        comments={latestVideo.data.statistics.commentCount}
-
-        />
+        {noVideoYet ? (
+          <>
+           <div className="flex w-full flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <div className="skeleton h-16 w-16 shrink-0 rounded-full"></div>
+                <div className="flex flex-col gap-4">
+                  <div className="skeleton h-4 w-20"></div>
+                  <div className="skeleton h-4 w-28"></div>
+                </div>
+              </div>
+              <div className="skeleton h-32 w-full"></div>
+            </div>
+          
+          </>
+        ) : (
+          <>
+            <RecentVideo
+              src={latestVideo.data.snippet.thumbnails.maxres.url}
+              title={latestVideo.data.snippet.title}
+              views={latestVideo.data.statistics.viewCount}
+              likes={latestVideo.data.statistics.likeCount}
+              dislikes={latestVideo.data.statistics.dislikeCount}
+              favorites={latestVideo.data.statistics.favoriteCount}
+              comments={latestVideo.data.statistics.commentCount}
+            />
+          </>
+        )}
       </div>
     </div>
   );

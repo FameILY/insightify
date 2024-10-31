@@ -25,8 +25,12 @@ async function fetchYoutubeAnalyticsData(accessToken) {
     },
   });
 
-  const data = await response.json();
-  return data.rows;
+  if  (response.status == 403){
+    return null
+  } else {
+    const data = await response.json();
+    return data.rows;
+  }
 }
 
 
@@ -78,6 +82,9 @@ export async function GET(req) {
   try {
     const data = await fetchYoutubeAnalyticsData(tokenData.access_token);
 
+   if (!data){
+     return NextResponse.json({message: "Couldn't fetch youtube analytics data for this channel OR channel doesnt exists"},{ status: 403})
+   }
     const formattedData = transformData(data)
     
     return NextResponse.json({ message: "Success", data: formattedData }, { status: 200 });

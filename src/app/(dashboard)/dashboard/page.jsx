@@ -18,9 +18,10 @@ export default function Dashboard() {
   const [views, setViews] = new useState("");
   const [maxViews, setMaxViews] = new useState("");
   const[ dataForLine, setDataForLine ] = new useState("");
-
+  
   const [loading, setLoading] = useState(true);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [channelExist, setChannelExist] = useState(false);
 
   function handleRedirect() {
     try {
@@ -61,7 +62,9 @@ export default function Dashboard() {
 
     const data = await res.json();
 
-    if (data.message) {
+    if (data.message && data.data.items) {
+      setChannelExist(true);
+
       console.log(data.message);
       // Update subs and views
       const subscriberCount = parseInt(
@@ -80,6 +83,8 @@ export default function Dashboard() {
       setMaxSubs(maxsubs);
       setMaxViews(maxviews);
       setLoading(false);
+    } else {
+      setChannelExist(false);
     }
   };
 
@@ -101,11 +106,16 @@ export default function Dashboard() {
 
     const data = await res.json();
 
-    if (data.message) {
+    
+    if (res.status == 200) {
+      setChannelExist(true)
+
       console.log(data.message);
       
       setDataForLine(data.data)
       setLoading(false);
+    } else {
+      setChannelExist(false)
     }
 
   }
@@ -148,6 +158,29 @@ export default function Dashboard() {
         <span className="loading loading-ring loading-lg"></span>
       </div>
     );
+  }
+
+  if (!channelExist) {
+    return (
+      <>
+      <div className="w-full flex justify-center items-center">
+          <div className="hero min-h-screen">
+            <div className="hero-content text-center">
+              <div className="max-w-md">
+                <h1 className="text-5xl font-bold">
+                  You dont have a channel yet!
+                </h1>
+                <p className="py-6">
+                  You can logout and login with a account with a channel
+                  associated here!
+                </p>
+                <a href="/settings"><Button className="">Login with Another Channel</Button></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
   }
   return (
     <div className="flex flex-col w-full">
